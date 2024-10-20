@@ -33,4 +33,4 @@ jobs:
       # Step 4: Push the Docker image to GHCR
       - name: Push Docker image
         run: |
-          docker push ghcr.io/${{ github.repository }}/math-cli:latest
+          docker push ghcr.io/gl5-devops-tp1/math-cli:latest
