@@ -1,0 +1,42 @@
+name: Test and Build
+
+on:
+  pull_request:
+    branches:
+      - main # Run the workflow for pull requests to the main branch
+  push:
+    branches:
+      - main # Run the workflow on pushes to the main branch
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Go environment
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.20 # Specify the Go version to use
+
+      # Step 3: Verify Go module dependencies
+      - name: Go mod tidy and vendor
+        run: |
+          go mod tidy
+          go mod vendor
+
+      # Step 4: Run tests
+      - name: Run Go tests
+        run: go test ./... -v
+
+      # Step 5: Build the Go binary
+      - name: Build Go binary
+        run: go build -o math-cli main.go
+
+      # Step 6: Verify the binary exists
+      - name: Check binary exists
+        run: test -f math-cli && echo "Binary built successfully."
