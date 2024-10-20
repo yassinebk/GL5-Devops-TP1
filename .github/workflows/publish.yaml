@@ -28,7 +28,7 @@ jobs:
       # Step 3: Build the Docker image
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/${{ github.repository }}/math-cli:latest .
+          docker build -t ghcr.io/gl5-devops-tp1/math-cli:latest .
 
       # Step 4: Push the Docker image to GHCR
       - name: Push Docker image
