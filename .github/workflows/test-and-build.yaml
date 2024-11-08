@@ -16,6 +16,8 @@ jobs:
       # Step 1: Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Needed for SonarQube to get all history
 
       # Step 2: Set up Go environment
       - name: Set up Go
@@ -29,14 +31,27 @@ jobs:
           go mod tidy
           go mod vendor
 
-      # Step 4: Run tests
-      - name: Run Go tests
-        run: go test ./... -v
+      # Step 4: Run tests with coverage
+      - name: Run Go tests with coverage
+        run: go test ./... -v -coverprofile=coverage.out
 
-      # Step 5: Build the Go binary
+      # Step 5: SonarQube Scan
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: http://207.154.215.246:9000
+        with:
+          args: >
+            -Dsonar.projectKey=${GITHUB_REPOSITORY#*/}
+            -Dsonar.sources=.
+            -Dsonar.go.coverage.reportPaths=coverage.out
+            -Dsonar.exclusions=**/*_test.go,**/vendor/**
+
+      # Step 6: Build the Go binary
       - name: Build Go binary
         run: go build -o math-cli main.go
 
-      # Step 6: Verify the binary exists
+      # Step 7: Verify the binary exists
       - name: Check binary exists
         run: test -f math-cli && echo "Binary built successfully."
